@@ -1,0 +1,105 @@
+--- ============================================================
+--- speed.xcx
+--- .
+--- Responsibility: convert a numeric value between speed units.
+--- .
+--- Supported units:
+---   ms    metres per second
+---   kmh   kilometres per hour
+---   mph   miles per hour
+---   fps   feet per second
+---   kn    knots (nautical miles per hour)
+---   mach  Mach number (at sea level, 15°C ≈ 340.29 m/s)
+--- .
+--- All conversions go through metres-per-second as the pivot.
+--- .
+--- Usage:
+---   f: result = convert_speed(value, "kmh", "mph");
+--- ============================================================
+
+
+--- ---- CONSTANTS ----
+
+--- Speed of sound at sea level, 15°C in m/s (ISA standard).
+const f: SPEED_OF_SOUND_MS = 340.29;
+
+
+--- ---- UNIT VALIDATION ----
+
+func is_valid_speed_unit(s: unit -> b) {
+    return unit == "ms"  OR unit == "kmh"  OR unit == "mph"
+        OR unit == "fps" OR unit == "kn"   OR unit == "mach";
+};
+
+
+--- ---- TO METRES PER SECOND ----
+
+func speed_to_ms(f: value, s: from_unit -> f) {
+    if (from_unit == "ms")   then; return value; end;
+    if (from_unit == "kmh")  then; return value / 3.6; end;
+    if (from_unit == "mph")  then; return value * 0.44704; end;
+    if (from_unit == "fps")  then; return value * 0.3048; end;
+    if (from_unit == "kn")   then; return value * 0.514444; end;
+    if (from_unit == "mach") then; return value * SPEED_OF_SOUND_MS; end;
+    halt.error >! "Unknown speed unit: " + from_unit;
+    return 0.0;
+};
+
+
+--- ---- FROM METRES PER SECOND ----
+
+func ms_to_speed(f: metres_per_second, s: to_unit -> f) {
+    if (to_unit == "ms")   then; return metres_per_second; end;
+    if (to_unit == "kmh")  then; return metres_per_second * 3.6; end;
+    if (to_unit == "mph")  then; return metres_per_second / 0.44704; end;
+    if (to_unit == "fps")  then; return metres_per_second / 0.3048; end;
+    if (to_unit == "kn")   then; return metres_per_second / 0.514444; end;
+    if (to_unit == "mach") then; return metres_per_second / SPEED_OF_SOUND_MS; end;
+    halt.error >! "Unknown speed unit: " + to_unit;
+    return 0.0;
+};
+
+
+--- ---- MAIN CONVERSION ----
+
+func convert_speed(f: value, s: from_unit, s: to_unit -> f) {
+    f: as_ms = speed_to_ms(value, from_unit);
+    return ms_to_speed(as_ms, to_unit);
+};
+
+
+--- ---- MENU ----
+
+func menu_speed() {
+    >! "";
+    >! "  -- Speed --";
+    >! "  Units: ms  kmh  mph  fps  kn  mach";
+    >! "";
+
+    s: from_unit = "";
+    s: to_unit   = "";
+    f: value;
+
+    >! "  From unit:";
+    >? from_unit;
+
+    if (is_valid_speed_unit(from_unit) == false) then;
+        >! "  Unknown unit: " + from_unit;
+        return;
+    end;
+
+    >! "  To unit:";
+    >? to_unit;
+
+    if (is_valid_speed_unit(to_unit) == false) then;
+        >! "  Unknown unit: " + to_unit;
+        return;
+    end;
+
+    >! "  Value:";
+    >? value;
+
+    f: result = convert_speed(value, from_unit, to_unit);
+    >! "";
+    >! "  " + s(value) + " " + from_unit + "  =  " + s(result) + " " + to_unit;
+};

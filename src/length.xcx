@@ -1,0 +1,109 @@
+--- ============================================================
+--- length.xcx
+--- .
+--- Responsibility: convert a numeric value between length units.
+--- . 
+--- Supported units:
+---   m   metre
+---   km  kilometre
+---   cm  centimetre
+---   mm  millimetre
+---   mi  mile
+---   ft  foot
+---   in  inch
+---   yd  yard
+--- .
+--- All conversions go through metres as the pivot unit.
+--- Conversion factors are exact or the standard SI definition.
+--- .
+--- Usage:
+---   f: result = convert_length(value, "km", "mi");
+--- ============================================================
+
+
+--- ---- UNIT VALIDATION ----
+
+func is_valid_length_unit(s: unit -> b) {
+    return unit == "m"  OR unit == "km" OR unit == "cm"
+        OR unit == "mm" OR unit == "mi" OR unit == "ft"
+        OR unit == "in" OR unit == "yd";
+};
+
+
+--- ---- TO METRES ----
+
+--- Converts a value from any supported unit to metres.
+func length_to_metres(f: value, s: from_unit -> f) {
+    if (from_unit == "m")  then; return value; end;
+    if (from_unit == "km") then; return value * 1000.0; end;
+    if (from_unit == "cm") then; return value / 100.0; end;
+    if (from_unit == "mm") then; return value / 1000.0; end;
+    if (from_unit == "mi") then; return value * 1609.344; end;
+    if (from_unit == "ft") then; return value * 0.3048; end;
+    if (from_unit == "in") then; return value * 0.0254; end;
+    if (from_unit == "yd") then; return value * 0.9144; end;
+    halt.error >! "Unknown length unit: " + from_unit;
+    return 0.0;
+};
+
+
+--- ---- FROM METRES ----
+
+--- Converts a value in metres to any supported unit.
+func metres_to_length(f: metres, s: to_unit -> f) {
+    if (to_unit == "m")  then; return metres; end;
+    if (to_unit == "km") then; return metres / 1000.0; end;
+    if (to_unit == "cm") then; return metres * 100.0; end;
+    if (to_unit == "mm") then; return metres * 1000.0; end;
+    if (to_unit == "mi") then; return metres / 1609.344; end;
+    if (to_unit == "ft") then; return metres / 0.3048; end;
+    if (to_unit == "in") then; return metres / 0.0254; end;
+    if (to_unit == "yd") then; return metres / 0.9144; end;
+    halt.error >! "Unknown length unit: " + to_unit;
+    return 0.0;
+};
+
+
+--- ---- MAIN CONVERSION ----
+
+func convert_length(f: value, s: from_unit, s: to_unit -> f) {
+    f: as_metres = length_to_metres(value, from_unit);
+    return metres_to_length(as_metres, to_unit);
+};
+
+
+--- ---- MENU ----
+
+func menu_length() {
+    >! "";
+    >! "  -- Length --";
+    >! "  Units: m  km  cm  mm  mi  ft  in  yd";
+    >! "";
+
+    s: from_unit = "";
+    s: to_unit   = "";
+    f: value;
+
+    >! "  From unit:";
+    >? from_unit;
+
+    if (is_valid_length_unit(from_unit) == false) then;
+        >! "  Unknown unit: " + from_unit;
+        return;
+    end;
+
+    >! "  To unit:";
+    >? to_unit;
+
+    if (is_valid_length_unit(to_unit) == false) then;
+        >! "  Unknown unit: " + to_unit;
+        return;
+    end;
+
+    >! "  Value:";
+    >? value;
+
+    f: result = convert_length(value, from_unit, to_unit);
+    >! "";
+    >! "  " + s(value) + " " + from_unit + "  =  " + s(result) + " " + to_unit;
+};

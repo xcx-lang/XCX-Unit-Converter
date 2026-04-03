@@ -1,0 +1,103 @@
+--- ============================================================
+--- weight.xcx
+--- .
+--- Responsibility: convert a numeric value between weight units.
+--- .
+--- Supported units:
+---   kg   kilogram
+---   g    gram
+---   mg   milligram
+---   lb   pound
+---   oz   ounce
+---   t    metric tonne
+---   st   stone
+--- .
+--- All conversions go through kilograms as the pivot unit.
+--- .
+--- Usage:
+---   f: result = convert_weight(value, "kg", "lb");
+--- ============================================================
+
+
+--- ---- UNIT VALIDATION ----
+
+func is_valid_weight_unit(s: unit -> b) {
+    return unit == "kg" OR unit == "g"  OR unit == "mg"
+        OR unit == "lb" OR unit == "oz" OR unit == "t"
+        OR unit == "st";
+};
+
+
+--- ---- TO KILOGRAMS ----
+
+func weight_to_kilograms(f: value, s: from_unit -> f) {
+    if (from_unit == "kg") then; return value; end;
+    if (from_unit == "g")  then; return value / 1000.0; end;
+    if (from_unit == "mg") then; return value / 1000000.0; end;
+    if (from_unit == "lb") then; return value * 0.45359237; end;
+    if (from_unit == "oz") then; return value * 0.028349523125; end;
+    if (from_unit == "t")  then; return value * 1000.0; end;
+    if (from_unit == "st") then; return value * 6.35029318; end;
+    halt.error >! "Unknown weight unit: " + from_unit;
+    return 0.0;
+};
+
+
+--- ---- FROM KILOGRAMS ----
+
+func kilograms_to_weight(f: kilograms, s: to_unit -> f) {
+    if (to_unit == "kg") then; return kilograms; end;
+    if (to_unit == "g")  then; return kilograms * 1000.0; end;
+    if (to_unit == "mg") then; return kilograms * 1000000.0; end;
+    if (to_unit == "lb") then; return kilograms / 0.45359237; end;
+    if (to_unit == "oz") then; return kilograms / 0.028349523125; end;
+    if (to_unit == "t")  then; return kilograms / 1000.0; end;
+    if (to_unit == "st") then; return kilograms / 6.35029318; end;
+    halt.error >! "Unknown weight unit: " + to_unit;
+    return 0.0;
+};
+
+
+--- ---- MAIN CONVERSION ----
+
+func convert_weight(f: value, s: from_unit, s: to_unit -> f) {
+    f: as_kilograms = weight_to_kilograms(value, from_unit);
+    return kilograms_to_weight(as_kilograms, to_unit);
+};
+
+
+--- ---- MENU ----
+
+func menu_weight() {
+    >! "";
+    >! "  -- Weight --";
+    >! "  Units: kg  g  mg  lb  oz  t  st";
+    >! "";
+
+    s: from_unit = "";
+    s: to_unit   = "";
+    f: value;
+
+    >! "  From unit:";
+    >? from_unit;
+
+    if (is_valid_weight_unit(from_unit) == false) then;
+        >! "  Unknown unit: " + from_unit;
+        return;
+    end;
+
+    >! "  To unit:";
+    >? to_unit;
+
+    if (is_valid_weight_unit(to_unit) == false) then;
+        >! "  Unknown unit: " + to_unit;
+        return;
+    end;
+
+    >! "  Value:";
+    >? value;
+
+    f: result = convert_weight(value, from_unit, to_unit);
+    >! "";
+    >! "  " + s(value) + " " + from_unit + "  =  " + s(result) + " " + to_unit;
+};

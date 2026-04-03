@@ -1,0 +1,93 @@
+--- ============================================================
+--- temperature.xcx
+--- . 
+--- Responsibility: convert a numeric value between temperature
+--- units: Celsius (C), Fahrenheit (F), and Kelvin (K).
+--- . 
+--- All conversions go through Celsius as the pivot unit:
+---   any → celsius → any
+--- .
+--- Usage:
+---   f: result = convert_temperature(value, "C", "F");
+--- ============================================================
+
+
+--- ---- UNIT VALIDATION ----
+
+--- Returns true if the unit string is a supported temperature unit.
+func is_valid_temperature_unit(s: unit -> b) {
+    return unit == "C" OR unit == "F" OR unit == "K";
+};
+
+
+--- ---- TO CELSIUS ----
+
+--- Converts a value from any supported unit to Celsius.
+func temperature_to_celsius(f: value, s: from_unit -> f) {
+    if (from_unit == "C") then; return value; end;
+    if (from_unit == "F") then; return (value - 32.0) * 5.0 / 9.0; end;
+    if (from_unit == "K") then; return value - 273.15; end;
+    halt.error >! "Unknown temperature unit: " + from_unit;
+    return 0.0;
+};
+
+
+--- ---- FROM CELSIUS ----
+
+--- Converts a Celsius value to any supported unit.
+func celsius_to_temperature(f: celsius, s: to_unit -> f) {
+    if (to_unit == "C") then; return celsius; end;
+    if (to_unit == "F") then; return celsius * 9.0 / 5.0 + 32.0; end;
+    if (to_unit == "K") then; return celsius + 273.15; end;
+    halt.error >! "Unknown temperature unit: " + to_unit;
+    return 0.0;
+};
+
+
+--- ---- MAIN CONVERSION ----
+
+--- Converts `value` from `from_unit` to `to_unit`.
+--- Supported units: C, F, K
+func convert_temperature(f: value, s: from_unit, s: to_unit -> f) {
+    f: as_celsius = temperature_to_celsius(value, from_unit);
+    return celsius_to_temperature(as_celsius, to_unit);
+};
+
+
+--- ---- MENU ----
+
+--- Runs the interactive temperature conversion menu.
+--- Asks the user for source unit, target unit, and value.
+func menu_temperature() {
+    >! "";
+    >! "  -- Temperature --";
+    >! "  Units: C  F  K";
+    >! "";
+
+    s: from_unit = "";
+    s: to_unit   = "";
+    f: value;
+
+    >! "  From unit:";
+    >? from_unit;
+
+    if (is_valid_temperature_unit(from_unit) == false) then;
+        >! "  Unknown unit: " + from_unit;
+        return;
+    end;
+
+    >! "  To unit:";
+    >? to_unit;
+
+    if (is_valid_temperature_unit(to_unit) == false) then;
+        >! "  Unknown unit: " + to_unit;
+        return;
+    end;
+
+    >! "  Value:";
+    >? value;
+
+    f: result = convert_temperature(value, from_unit, to_unit);
+    >! "";
+    >! "  " + s(value) + " " + from_unit + "  =  " + s(result) + " " + to_unit;
+};

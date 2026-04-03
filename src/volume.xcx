@@ -1,0 +1,119 @@
+--- ============================================================
+--- volume.xcx
+--- .
+--- Responsibility: convert a numeric value between volume units.
+--- . 
+--- Supported units:
+---   l     litre
+---   ml    millilitre
+---   cl    centilitre
+---   m3    cubic metre
+---   cm3   cubic centimetre (= ml)
+---   gal   US gallon
+---   qt    US quart
+---   pt    US pint
+---   cup   US cup
+---   floz  US fluid ounce
+---   tbsp  tablespoon (US)
+---   tsp   teaspoon (US)
+--- .
+--- All conversions go through litres as the pivot unit.
+--- .
+--- Usage:
+---   f: result = convert_volume(value, "l", "gal");
+--- ============================================================
+
+
+--- ---- UNIT VALIDATION ----
+
+func is_valid_volume_unit(s: unit -> b) {
+    return unit == "l"    OR unit == "ml"   OR unit == "cl"
+        OR unit == "m3"   OR unit == "cm3"  OR unit == "gal"
+        OR unit == "qt"   OR unit == "pt"   OR unit == "cup"
+        OR unit == "floz" OR unit == "tbsp" OR unit == "tsp";
+};
+
+
+--- ---- TO LITRES ----
+
+func volume_to_litres(f: value, s: from_unit -> f) {
+    if (from_unit == "l")    then; return value; end;
+    if (from_unit == "ml")   then; return value / 1000.0; end;
+    if (from_unit == "cl")   then; return value / 100.0; end;
+    if (from_unit == "m3")   then; return value * 1000.0; end;
+    if (from_unit == "cm3")  then; return value / 1000.0; end;
+    if (from_unit == "gal")  then; return value * 3.785411784; end;
+    if (from_unit == "qt")   then; return value * 0.946352946; end;
+    if (from_unit == "pt")   then; return value * 0.473176473; end;
+    if (from_unit == "cup")  then; return value * 0.2365882365; end;
+    if (from_unit == "floz") then; return value * 0.0295735296; end;
+    if (from_unit == "tbsp") then; return value * 0.0147867648; end;
+    if (from_unit == "tsp")  then; return value * 0.0049289216; end;
+    halt.error >! "Unknown volume unit: " + from_unit;
+    return 0.0;
+};
+
+
+--- ---- FROM LITRES ----
+
+func litres_to_volume(f: litres, s: to_unit -> f) {
+    if (to_unit == "l")    then; return litres; end;
+    if (to_unit == "ml")   then; return litres * 1000.0; end;
+    if (to_unit == "cl")   then; return litres * 100.0; end;
+    if (to_unit == "m3")   then; return litres / 1000.0; end;
+    if (to_unit == "cm3")  then; return litres * 1000.0; end;
+    if (to_unit == "gal")  then; return litres / 3.785411784; end;
+    if (to_unit == "qt")   then; return litres / 0.946352946; end;
+    if (to_unit == "pt")   then; return litres / 0.473176473; end;
+    if (to_unit == "cup")  then; return litres / 0.2365882365; end;
+    if (to_unit == "floz") then; return litres / 0.0295735296; end;
+    if (to_unit == "tbsp") then; return litres / 0.0147867648; end;
+    if (to_unit == "tsp")  then; return litres / 0.0049289216; end;
+    halt.error >! "Unknown volume unit: " + to_unit;
+    return 0.0;
+};
+
+
+--- ---- MAIN CONVERSION ----
+
+func convert_volume(f: value, s: from_unit, s: to_unit -> f) {
+    f: as_litres = volume_to_litres(value, from_unit);
+    return litres_to_volume(as_litres, to_unit);
+};
+
+
+--- ---- MENU ----
+
+func menu_volume() {
+    >! "";
+    >! "  -- Volume --";
+    >! "  Units: l  ml  cl  m3  cm3  gal  qt  pt  cup  floz  tbsp  tsp";
+    >! "";
+
+    s: from_unit = "";
+    s: to_unit   = "";
+    f: value;
+
+    >! "  From unit:";
+    >? from_unit;
+
+    if (is_valid_volume_unit(from_unit) == false) then;
+        >! "  Unknown unit: " + from_unit;
+        return;
+    end;
+
+    >! "  To unit:";
+    >? to_unit;
+
+    if (is_valid_volume_unit(to_unit) == false) then;
+        >! "  Unknown unit: " + to_unit;
+        return;
+    end;
+
+    >! "  Value:";
+    >? value;
+
+    f: result = convert_volume(value, from_unit, to_unit);
+    >! "";
+    >! "  " + s(value) + " " + from_unit + "  =  " + s(result) + " " + to_unit;
+};

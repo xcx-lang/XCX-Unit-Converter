@@ -1,0 +1,73 @@
+--- ============================================================
+--- main.xcx
+--- .
+--- Entry point for the XCX Unit Converter.
+--- .
+--- Presents a top-level category menu and delegates to the
+--- appropriate module for each conversion category:
+--- .
+---   1 → temperature.xcx   (C / F / K)
+---   2 → length.xcx        (m / km / mi / ft / in / yd / …)
+---   3 → weight.xcx        (kg / g / lb / oz / t / st / …)
+---   4 → volume.xcx        (l / ml / gal / pt / cup / …)
+---   5 → speed.xcx         (m/s / km/h / mph / knots / mach)
+---   q → quit
+--- .
+--- Include chain:
+---   main → speed → volume → weight → length → temperature
+--- ============================================================
+
+include "temperature.xcx";
+include "length.xcx";
+include "weight.xcx";
+include "volume.xcx";
+include "speed.xcx";
+
+
+--- ---- BANNER ----
+
+func print_banner() {
+    >! "================================================================";
+    >! "  XCX Unit Converter";
+    >! "================================================================";
+    >! "  1  Temperature   (C, F, K)";
+    >! "  2  Length        (m, km, cm, mm, mi, ft, in, yd)";
+    >! "  3  Weight        (kg, g, mg, lb, oz, t, st)";
+    >! "  4  Volume        (l, ml, cl, gal, qt, pt, cup, floz...)";
+    >! "  5  Speed         (ms, kmh, mph, fps, kn, mach)";
+    >! "----------------------------------------------------------------";
+    >! "  q  Quit";
+    >! "================================================================";
+};
+
+
+--- ---- ENTRY POINT ----
+
+print_banner();
+
+s: choice = "";
+
+while (choice != "q") do;
+    >! "";
+    >! "Category:";
+    >? choice;
+
+    if (choice == "q") then;
+        break;
+    elif (choice == "1") then;
+        menu_temperature();
+    elif (choice == "2") then;
+        menu_length();
+    elif (choice == "3") then;
+        menu_weight();
+    elif (choice == "4") then;
+        menu_volume();
+    elif (choice == "5") then;
+        menu_speed();
+    else;
+        >! "  Unknown choice: " + choice;
+    end;
+end;
+
+>! "";
+>! "Goodbye.";

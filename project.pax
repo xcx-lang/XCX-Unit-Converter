@@ -1,0 +1,8 @@
+---
+PAX Project Configuration
+*---
+/
+    name :: "Unit-Converter",
+    deps :: [
+    ]
+/
