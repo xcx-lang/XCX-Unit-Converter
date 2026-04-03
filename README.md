@@ -18,6 +18,7 @@ All conversions use a pivot-unit approach for accuracy and maintainability.
 
 ## Project Structure
 
+``` text
 Unit-Converter/
 ├── project.pax          # Project configuration
 └── src/
@@ -27,6 +28,7 @@ Unit-Converter/
     ├── weight.xcx       # Weight conversion module
     ├── volume.xcx       # Volume conversion module
     └── speed.xcx        # Speed conversion module
+```
 
 ---
 
